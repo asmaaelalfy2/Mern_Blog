@@ -1,3 +1,4 @@
 {
-  "mongoURI": "mongodb+srv://asmaa:asmaa@cluster0.lodmq.mongodb.net/blogs?retryWrites=true&w=majority"
+  "mongoURI": "mongodb+srv://asmaa:asmaa@cluster0.lodmq.mongodb.net/blogs?retryWrites=true&w=majority",
+  "jwtSecret":"secret"
 }
