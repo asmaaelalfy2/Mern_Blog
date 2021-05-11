@@ -4,7 +4,7 @@ const router = express.Router();
 
 const Blog = require('../models/Blog');
 const auth = require('../middleware/auth');
-
+const { check, validationResult } = require('express-validator');
 //@routes Get /api/blogs
 //@desc Get all blogs
 //@access public
@@ -22,14 +22,14 @@ router.get('/', async (req, res) => {
 // @desc add blog
 // @access private
 
-router.post('/', auth, async (req, res) => {
+router.post('/', [auth], async (req, res) => {
   let tags = [];
   if (req.body.tags) {
     tags = req.body.tags.split(',');
   }
 
   const blog = new Blog({
-    userId: req.body.userId,
+    userId: req.user.id,
     title: req.body.title,
     body: req.body.body,
     tags: tags,
@@ -46,7 +46,7 @@ router.post('/', auth, async (req, res) => {
 // @routes Get /api/blogs/user/:userId
 // @desc Get  specific user blog
 // @access public
-router.get('/user/:userId', async (req, res) => {
+router.get('/:user/:userId', async (req, res) => {
   console.log(req.params.userId);
   try {
     const blog = await Blog.find({ userId: req.params.userId });
@@ -86,27 +86,61 @@ router.delete('/:blogId', auth, async (req, res) => {
 //@desc update specific blog
 //@access private
 
-router.put('/:blogId', auth, async (req, res) => {
-  let tags = [];
-  if (req.body.tags) {
-    tags = req.body.tags.split(',');
-  }
+// router.put('/:blogId', auth, async (req, res) => {
+//   // let tags = [];
+//   // if (req.body.tags) {
+//   //   tags = req.body.tags.split(',');
+//   // }
 
-  const blog = new Blog({
-    _id: req.params.blogId,
-    userId: req.body.userId,
-    title: req.body.title,
-    body: req.body.body,
-    tags: tags,
-  });
-  Blog.updateOne({ _id: req.params.blogId }, blog)
-    .then((b) => {
-      console.log(b);
-      res.json(blog);
-    })
-    .catch((err) => {
-      res.json({ message: err });
-    });
+//   const blog = new Blog({
+//     _id: req.params.blogId,
+//     userId: req.user.id,
+//     title: req.body.title,
+//     body: req.body.body,
+//     tags: tags,
+//   });
+//   await Blog.updateOne({ _id: req.params.blogId }, blog)
+//     .then((b) => {
+//       console.log(b);
+//       res.json(blog);
+//     })
+//     .catch((err) => {
+//       res.json({ message: err });
+//     });
+// });
+
+router.put('/:blogId', auth, async (req, res) => {
+  try {
+    const blogfind = await Blog.findById(req.params.blogId);
+    if (!blogfind) {
+      return res.status(400).json({ msg: 'blog not found' });
+    }
+    const blogUpdate = await Blog.findByIdAndUpdate(
+      req.params.blogId,
+
+      req.body,
+      { new: true }
+    );
+    const blogSaved = await blogUpdate.save();
+    res.json(blogSaved);
+  } catch (error) {
+    console.error(error.msg);
+    res.status(500).send('server errors');
+  }
 });
+
+// router.get('/blogs/:user/:userId', async (req, res) => {
+//   try {
+//     const blogs = await Task.find({ user: req.params.userId }).sort({
+//       date: -1,
+//     });
+//     if (!blogs) {
+//       res.status(404).send('No Blogs');
+//     }
+//     res.status(201).send(blogs);
+//   } catch (e) {
+//     res.status(500).send(e);
+//   }
+// });
 
 module.exports = router;

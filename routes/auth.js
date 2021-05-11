@@ -27,7 +27,7 @@ router.get('/',auth, async(req, res) => {
       }
 });
 
-//@routes POSR /api/users
+//@routes POSR /api/auth
 //@desc Auth users and get the token
 //@access public
 

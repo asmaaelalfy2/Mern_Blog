@@ -1,3 +1,13 @@
+.profile-card {
+  max-width: 90%;
+  text-align: center;
+  margin: 0 auto;
+  color: whitesmoke;
+}
+.profile-card:hover {
+  color: #e7810a;
+}
+
 :root {
   --primary-color: #9dbeb9;
   --dark-color: #333333;
@@ -259,7 +269,7 @@ img {
   background: var(--danger-color);
   color: #fff;
 }
-
+.text-success,
 .btn-success,
 .bg-success,
 .badge-success,

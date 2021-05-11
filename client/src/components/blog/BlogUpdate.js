@@ -1,9 +1,23 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useHistory, Redirect } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import blogContext from '../../context/blog/blogContext';
 
-const BlogPost = () => {
-  const { addBlog, current, clearBlog, updateBlog } = useContext(blogContext);
+const BlogUpdate = () => {
+  const { updateBlog, current } = useContext(blogContext);
+
+  const history = useHistory();
+
+  useEffect(() => {
+    if (current !== null) {
+      setBlog(current);
+    } else {
+      setBlog({
+        body: '',
+        title: '',
+        tags: [],
+      });
+    }
+  }, [current]);
 
   const [blog, setBlog] = useState({
     title: '',
@@ -12,34 +26,19 @@ const BlogPost = () => {
   });
   const { title, body, tags } = blog;
   const onChange = (e) => setBlog({ ...blog, [e.target.name]: e.target.value });
-  let history = useHistory();
-
-  useEffect(() => {
-    if (current == null) {
-      setBlog({
-        title: '',
-        body: '',
-        tags: [],
-      });
-    }
-  }, [current]);
 
   const onSubmit = (e) => {
     e.preventDefault();
-
-    if (current == null) {
-      addBlog(blog);
+    if(current !==null){
+      updateBlog(blog);
       return history.push('/');
     }
-    clearBlog();
+   
   };
-  // const clearAll = () => {
-  //   clearContact();
-  // };
 
   return (
     <form onSubmit={onSubmit}>
-      <h2 className='text-primary'>Create Blog</h2>
+      <h2 className='text-primary'>Update Blog</h2>
 
       <input
         type='text'
@@ -67,11 +66,11 @@ const BlogPost = () => {
       <div>
         <input
           type='submit'
-          value='submit'
+          value='Update'
           className='btn btn-block btn-primary'
         />
       </div>
     </form>
   );
 };
-export default BlogPost;
+export default BlogUpdate;

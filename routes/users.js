@@ -32,6 +32,7 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
+    
     const { email, firstname, lastname, password } = req.body;
     try {
       let user = await User.findOne({ email });
@@ -43,7 +44,6 @@ router.post(
       user.password = await bcrypt.hash(password, salt);
       user.save();
 
-      
       const payload = {
         user: {
           id: user.id,
@@ -58,7 +58,6 @@ router.post(
           res.json({ token });
         }
       );
-
     } catch (err) {
       console.error(err.message);
       res.status(500).send('server error');
@@ -101,21 +100,18 @@ router.post('/follow/:userId', auth, async (req, res) => {
     let user = await User.findById(req.user.id);
     if (!user.following.includes(req.params.userId)) {
       const followedUser = await User.findById(req.user.id);
-    //   console.log(followedUser);
+      //   console.log(followedUser);
       followedUser.following.push(req.params.userId);
       followedUser.save();
 
-      const findUser = await User.findOne({ id: req.params.userId });
+      const findUser = await User.findOne({ _id: req.params.userId });
       findUser.followers.push(req.user.id);
-      
-      findUser.save();
 
-    res.json(followedUser);
-   
+      findUser.save();
+      res.json(followedUser);
     } else {
       res.status(400).send({ message: 'You already followed this user' });
     }
-   
   } catch (err) {
     res.json({ message: err });
   }
@@ -140,12 +136,10 @@ router.post('/unfollow/:userId', auth, async (req, res) => {
       findUser.save();
 
       res.json(followedUser);
-      console.log(followedUser);
+      // console.log(followedUser);
     } else {
       res.status(400).send({ message: "You aren't following this user" });
     }
-
-
   } catch (err) {
     res.json({ message: err });
   }
